@@ -30,7 +30,7 @@ client.on("interactionCreate", async (interaction) => {
         'Authorization': `Bearer ${jwtk}`
       }
     }).then((data) => {
-      console.log("Is data ok: " + data.ok)
+      console.log("Is data ok: " + data.status)
       data.json().then(clanMembers => {
         clanMembers['items'].forEach(member => {
           const memberData = []

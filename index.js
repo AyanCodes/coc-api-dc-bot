@@ -24,8 +24,8 @@ client.on("interactionCreate", async (interaction) => {
       }
     })
       .then((data) => {
-        console.log(data)
         data.json().then(clanMembers => {
+          console.log(clanMembers)
           clanMembers['items'].forEach(member => {
             const memberData = []
             memberData.push(

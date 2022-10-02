@@ -3,17 +3,10 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds], partials: [Part
 import dotenv from "dotenv";
 dotenv.config()
 import fetch from 'node-fetch';
-const jwtk = process.env.jwtk;
 
 client.once("ready", () => {
   console.log("Bot started as " + client.user.tag)
   client.user.setActivity("something");
-})
-
-client.on("messageCreate", (msg) => {
-  console.log(msg.content)
-  const command = msg.content.slice(prefix.length)
-  msg.reply(command)
 })
 
 client.on("interactionCreate", async (interaction) => {
@@ -27,10 +20,10 @@ client.on("interactionCreate", async (interaction) => {
       method: "GET",
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${jwtk}`
+        'Authorization': `Bearer ${process.env.jwtk}`
       }
     }).then((data) => {
-      console.log("Is data ok: " + data.status)
+      console.log(`Is data ok: ${data.status}`)
       data.json().then(clanMembers => {
         clanMembers['items'].forEach(member => {
           const memberData = []

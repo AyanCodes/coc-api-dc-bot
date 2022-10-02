@@ -11,20 +11,20 @@ client.once("ready", () => {
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
-  console.log(process.env.jwtk)
   const { commandName } = interaction;
 
   if (commandName === 'clanmembers') {
     const clanMembersList = []
-    const res = fetch('https://api.clashofclans.com/v1/clans/%232QQYCLJVV/members', {
+    fetch('https://api.clashofclans.com/v1/clans/%232QQYCLJVV/members', {
       method: "GET",
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.jwtk}`
+        'Authorization': `Bearer ${process.env.JWTK}`
       }
     })
       .then((data) => {
         data.json().then(clanMembers => {
+          console.log(clanMembers)
           clanMembers['items'].forEach(member => {
             const memberData = []
             memberData.push(

@@ -1,90 +1,54 @@
-const { Client, Intents, MessageEmbed, Modal } = require("discord.js");
-require('dotenv').config()
-const fetch = require("node-fetch");
-const client = new Client({
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
-});
-
-const prefix = "$";
-let name;
+import { Client, GatewayIntentBits, Partials } from 'discord.js';
+const client = new Client({ intents: [GatewayIntentBits.Guilds], partials: [Partials.Channel] });
+import dotenv from "dotenv";
+dotenv.config()
+import fetch from 'node-fetch';
+const jwtk = process.env.jwtk;
 
 client.once("ready", () => {
-  console.log(`Logged in as ${client.user.tag}!`);
-  client.user.setActivity(`${prefix}help`);
-});
+  console.log("Bot started as " + client.user.tag)
+  client.user.setActivity("Playing something");
+})
 
-client.on("messageCreate", async (msg) => {
-  const args = msg.content.slice(prefix.length).trim().split(" ");
-  const command = args.shift().toLowerCase();
-    
-  if (command === "bedwars") {
-    if (!args.length) {
-			return msg.channel.send(`You didn't provide any username, ${msg.author}!`);
-    }
+client.on("messageCreate", (msg) => {
+  console.log(msg.content)
+  const command = msg.content.slice(prefix.length)
+  msg.reply(command)
+})
 
-    name = args
-    console.log(name)
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isChatInputCommand()) return;
 
-    try {
-      const uuidResponse = await fetch(`https://api.mojang.com/users/profiles/minecraft/${args}`)
-      const uuidData =  await uuidResponse.json()
+  const { commandName } = interaction;
 
-      const response = await fetch(
-        `https://api.hypixel.net/player?key=38bf93a7-0d96-4ee8-8d9b-95281dc3e28a&uuid=${uuidData.id}`
-      );
-
-      if (!response.ok) return
-  
-      const data = await response.json();
-      const playerBwStats = data.player.stats.Bedwars;
-  
-      const bedwarsStats = {
-        level: data.player.achievements.bedwars_level.toLocaleString(),
-        coins: playerBwStats.coins.toLocaleString(),
-        winstreak: playerBwStats.winstreak,
-        kills: playerBwStats.kills_bedwars.toLocaleString(),
-        deaths: playerBwStats.deaths_bedwars.toLocaleString(),
-        kdr: Math.round(playerBwStats.kills_bedwars / playerBwStats.deaths_bedwars * 10) / 10,
-        finalKills: playerBwStats.final_kills_bedwars.toLocaleString(),
-        finalDeaths: playerBwStats.final_deaths_bedwars.toLocaleString(),
-        fkdr: Math.round(playerBwStats.final_kills_bedwars / playerBwStats.final_deaths_bedwars * 10) / 10,
-        wins: playerBwStats.wins_bedwars.toLocaleString(),
-        losses: playerBwStats.losses_bedwars.toLocaleString(),
-        wlr: Math.round(playerBwStats.wins_bedwars / playerBwStats.losses_bedwars * 10) / 10,
-        bedsBroken: playerBwStats.beds_broken_bedwars.toLocaleString(),
-        bedsLost: playerBwStats.beds_lost_bedwars.toLocaleString(),
-        bblr: Math.round(playerBwStats.beds_broken_bedwars / playerBwStats.beds_lost_bedwars * 10) / 10,
+  if (commandName === 'clanmembers') {
+    const clanMembersList = []
+    fetch('https://api.clashofclans.com/v1/clans/%232QQYCLJVV/members', {
+      method: "GET",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwtk}`
       }
-      
-      const bedwarsStatsEmbed = new MessageEmbed();
-      bedwarsStatsEmbed.setTitle(`${args} Bedwars Stats`);
-      bedwarsStatsEmbed.color = "0x7289da";
-      bedwarsStatsEmbed.setThumbnail(`https://crafatar.com/renders/head/${uuidData.id}?overlay`)
-      bedwarsStatsEmbed.addFields(
-        { name: "Level:", value: `${bedwarsStats.level}`, inline: true },
-        { name: "Coins:", value: `${bedwarsStats.coins}`, inline: true },
-        { name: "Winstreak:", value: `${bedwarsStats.winstreak}`, inline: true },
-        { name: "Kills:", value: `${bedwarsStats.kills}`, inline: true },
-        { name: "Deaths:", value: `${bedwarsStats.deaths}`, inline: true, },
-        { name: "KDR:", value: `${bedwarsStats.kdr}`, inline: true, },
-        { name: "Final kills:", value: `${bedwarsStats.finalKills}`, inline: true, },
-        { name: "Final deaths:", value: `${bedwarsStats.finalDeaths}`, inline: true, },
-        { name: "FKDR:", value: `${bedwarsStats.fkdr}`, inline: true, },
-        { name: "Wins:", value: `${bedwarsStats.wins}`, inline: true, },
-        { name: "Losses:", value: `${bedwarsStats.losses}`, inline: true, },
-        { name: "WLR:", value: `${bedwarsStats.wlr}`, inline: true, },
-        { name: "Beds broken:", value: `${bedwarsStats.bedsBroken}`, inline: true },
-        { name: "Beds lost:", value: `${bedwarsStats.bedsLost}`, inline: true },
-        { name: "BBLR:", value: `${bedwarsStats.bblr}`, inline: true },
-      );
-      msg.reply({ embeds: [bedwarsStatsEmbed] });
-    } catch (error) {
-      msg.reply("Name not found or invalid")
-      console.log(error)
-    }
-   
-  } 
-});
+    }).then((data) => {
+      data.json().then(clanMembers => {
+        clanMembers['items'].forEach(member => {
+          const memberData = []
+          memberData.push(
+            "\n**Tag**: " + member.tag +
+            "\n**Name**: " + member.name +
+            " -- **Role**: " + member.role +
+            "\n**Donations**: " + member.donations +
+            " -- **Donations Recieved**: " + member.donationsReceived +
+            "\n--------------------------"
+          )
+          clanMembersList.push(memberData)
+        });
+        clanMembersList.push(`\n Total Members: ${clanMembers['items'].length}`)
+        interaction.reply(`${clanMembersList}`)
+      })
+    })
 
+  }
+})
 
-client.login(process.env.BOT_TOKEN);
+client.login(process.env.BOT_TOKEN)

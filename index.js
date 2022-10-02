@@ -7,7 +7,7 @@ const jwtk = process.env.jwtk;
 
 client.once("ready", () => {
   console.log("Bot started as " + client.user.tag)
-  client.user.setActivity("Playing something");
+  client.user.setActivity("something");
 })
 
 client.on("messageCreate", (msg) => {
@@ -30,6 +30,7 @@ client.on("interactionCreate", async (interaction) => {
         'Authorization': `Bearer ${jwtk}`
       }
     }).then((data) => {
+      console.log("Is data ok: " + data.ok)
       data.json().then(clanMembers => {
         clanMembers['items'].forEach(member => {
           const memberData = []

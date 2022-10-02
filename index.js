@@ -11,7 +11,7 @@ client.once("ready", () => {
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
-
+  console.log(process.env.jwtk)
   const { commandName } = interaction;
 
   if (commandName === 'clanmembers') {
@@ -25,7 +25,6 @@ client.on("interactionCreate", async (interaction) => {
     })
       .then((data) => {
         data.json().then(clanMembers => {
-          console.log(clanMembers)
           clanMembers['items'].forEach(member => {
             const memberData = []
             memberData.push(

@@ -16,31 +16,32 @@ client.on("interactionCreate", async (interaction) => {
 
   if (commandName === 'clanmembers') {
     const clanMembersList = []
-    fetch('https://api.clashofclans.com/v1/clans/%232QQYCLJVV/members', {
+    const res = fetch('https://api.clashofclans.com/v1/clans/%232QQYCLJVV/members', {
       method: "GET",
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${process.env.jwtk}`
       }
-    }).then((data) => {
-      console.log(`Is data ok: ${data.status}`)
-      data.json().then(clanMembers => {
-        clanMembers['items'].forEach(member => {
-          const memberData = []
-          memberData.push(
-            "\n**Tag**: " + member.tag +
-            "\n**Name**: " + member.name +
-            " -- **Role**: " + member.role +
-            "\n**Donations**: " + member.donations +
-            " -- **Donations Recieved**: " + member.donationsReceived +
-            "\n--------------------------"
-          )
-          clanMembersList.push(memberData)
-        });
-        clanMembersList.push(`\n Total Members: ${clanMembers['items'].length}`)
-        interaction.reply(`${clanMembersList}`)
-      })
     })
+      .then((data) => {
+        console.log(data)
+        data.json().then(clanMembers => {
+          clanMembers['items'].forEach(member => {
+            const memberData = []
+            memberData.push(
+              "\n**Tag**: " + member.tag +
+              "\n**Name**: " + member.name +
+              " -- **Role**: " + member.role +
+              "\n**Donations**: " + member.donations +
+              " -- **Donations Recieved**: " + member.donationsReceived +
+              "\n--------------------------"
+            )
+            clanMembersList.push(memberData)
+          });
+          clanMembersList.push(`\n Total Members: ${clanMembers['items'].length}`)
+          interaction.reply(`${clanMembersList}`)
+        })
+      })
 
   }
 })

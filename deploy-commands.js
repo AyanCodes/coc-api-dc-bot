@@ -1,13 +1,18 @@
-import { SlashCommandBuilder, Routes } from 'discord.js';
-import { REST } from '@discordjs/rest';
-
-import dotenv from "dotenv";
+const { SlashCommandBuilder, Routes } = require('discord.js');
+const { REST } = require('@discordjs/rest');
+const dotenv = require("dotenv")
 dotenv.config()
 
 const commands = [
 	new SlashCommandBuilder()
 		.setName('clanmembers')
-		.setDescription('Replies with the list of clan members'),
+		.setDescription('List clan members'),
+	new SlashCommandBuilder()
+		.setName('clan')
+		.setDescription('Info about clan'),
+	new SlashCommandBuilder()
+		.setName('clanwars')
+		.setDescription('Info about clan wars')
 ]
 	.map(command => command.toJSON());
 

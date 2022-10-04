@@ -8,11 +8,11 @@ const coc = new ClashClient();
 
 client.once("ready", async () => {
   console.log("Bot started as " + client.user.tag)
-  await coc.login({ email: 'ayanmconly@gmail.com', password: '9TWTZY4J@m6CN!W' });
+  await coc.login({ email: process.env.EMAIL, password: process.env.PASSWORD });
 })
 
-function getClanWarWlr(warWins, warLosses) {
-  const wlr = (warWins * 10) / (warLosses * 10)
+function getWLR(wins, losses) {
+  const wlr = (wins * 10) / (losses * 10)
   return wlr.toString()
 }
 
@@ -52,7 +52,7 @@ client.on("interactionCreate", async (interaction) => {
         { name: 'War Wins: ', value: clan.warWins.toString(), inline: true },
         { name: 'War Winstreak: ', value: clan.warWinStreak.toString(), inline: true },
         { name: 'War Losses: ', value: clan.warLosses.toString(), inline: true },
-        { name: 'War WLR: ', value: getClanWarWlr(clan.warWins, clan.warLosses), inline: true },
+        { name: 'War WLR: ', value: getWLR(clan.warWins, clan.warLosses), inline: true },
         { name: 'War Ties: ', value: clan.warTies.toString(), inline: true },
       )
     await interaction.reply({ embeds: [clanWarsEmbed] })
